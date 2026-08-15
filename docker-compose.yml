@@ -1,0 +1,54 @@
+version: "3.9"
+
+services:
+
+  pipeline:
+    build: .
+    container_name: bmw_pipeline
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+    command: python run_pipeline.py
+    environment:
+      AZURE_ML_ENABLED: "false"
+
+  dashboard:
+    build: .
+    container_name: bmw_dashboard
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+    depends_on:
+      - pipeline
+    command: >
+      streamlit run dashboard/app.py
+      --server.port=8501
+      --server.address=0.0.0.0
+      --server.headless=true
+
+  api:
+    build: .
+    container_name: bmw_api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+    depends_on:
+      - pipeline
+    command: uvicorn serving.serve:app --host 0.0.0.0 --port 8000
+
+  mlflow:
+    build: .
+    container_name: bmw_mlflow
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./models:/app/models
+    command: >
+      mlflow ui
+      --backend-store-uri sqlite:///models/mlflow.db
+      --host 0.0.0.0
+      --port 5000

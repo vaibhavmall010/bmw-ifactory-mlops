@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# MLflow database and artifacts
+models/mlflow.db
+models/*.png
+models/*.txt
+models/pipeline.log
+
+# MLflow runs folder — auto-generated, do not commit
+mlruns/
+mlartifacts/
+
+# Generated data files — too large for GitHub
+data/raw/*.parquet
+data/feature_store/*.parquet
+data/feature_store/*.json
+data/drift_reports/*.html
+data/drift_reports/*.json
+
+# Keep folder structure but not generated files
+!data/raw/.gitkeep
+!data/feature_store/.gitkeep
+!data/drift_reports/.gitkeep
+
+# Model pickle files — too large
+models/*.pkl
+models/mlflow.db
+
+# Keep registry info for reference
+!models/registry_info.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Environment variables
+.env
+*.env

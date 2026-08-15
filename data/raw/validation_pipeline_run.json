@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "errors": [],
+  "warnings": [],
+  "stats": {
+    "n_rows": 500,
+    "n_cycles": 500,
+    "anomaly_rate": 0.07,
+    "stations": {
+      "biw_welding": 100,
+      "paint_curing": 100,
+      "powertrain_torque": 100,
+      "closure_assembly": 100,
+      "eol_functional": 100
+    },
+    "col_means": {
+      "torque_nm": 132.995,
+      "vibration_g": 1.312,
+      "temperature_c": 89.371,
+      "cycle_time_s": 84.749,
+      "current_a": 30.324,
+      "pressure_bar": 5.601
+    }
+  },
+  "tag": "pipeline_run"
+}

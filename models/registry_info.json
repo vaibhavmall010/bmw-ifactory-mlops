@@ -1,0 +1,12 @@
+{
+  "registry_name": "BMWiFactoryAnomalyDetector",
+  "version": 1,
+  "run_id": "75a02b64b8364169b7f49f2bd0b896d6",
+  "model_name": "xgboost_classifier",
+  "cv_f1": 0.9093772893772893,
+  "recall": 1.0,
+  "precision": 1.0,
+  "roc_auc": 1.0,
+  "mlflow_uri": "sqlite:///C:\\Users\\mallv\\Documents\\Git Projects\\bmw_ifactory_mlops\\bmw_ifactory_mlops\\models\\mlflow.db",
+  "stage": "Production"
+}

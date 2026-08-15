@@ -1,0 +1,22 @@
+[
+  {
+    "name": "xgboost_classifier",
+    "run_id": "75a02b64b8364169b7f49f2bd0b896d6",
+    "cv_f1": 0.9093772893772893,
+    "cv_f1_std": 0.05913571991242554,
+    "train_f1": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "roc_auc": 1.0,
+    "accuracy": 1.0
+  },
+  {
+    "name": "isolation_forest",
+    "run_id": "bf3beeb26e2d4531a721cd20cfab24a3",
+    "train_f1": 0.8,
+    "precision": 0.8,
+    "recall": 0.8,
+    "accuracy": 0.972,
+    "cv_f1": 0.8
+  }
+]

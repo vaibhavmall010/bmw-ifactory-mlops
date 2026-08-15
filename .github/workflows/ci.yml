@@ -1,0 +1,103 @@
+name: BMW iFACTORY MLOps CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          flake8 pipeline/ serving/ monitoring/ dashboard/ tests/ \
+            --max-line-length=110 \
+            --ignore=E501,W503,E402 \
+            --exclude=__pycache__
+
+      - name: Run pytest suite
+        run: |
+          pytest tests/ -v --tb=short --no-header
+
+      - name: Run full pipeline smoke test
+        run: |
+          python run_pipeline.py
+
+      - name: Verify output artifacts
+        run: |
+          ls data/feature_store/
+          ls models/
+          ls data/drift_reports/
+          python -c "
+          import json
+          info = json.load(open('models/registry_info.json'))
+          assert info['stage'] == 'Production', 'Model not promoted to Production'
+          print(f'Production model: v{info[\"version\"]} ({info[\"model_name\"]})')
+          print(f'F1: {info[\"cv_f1\"]:.4f}  Recall: {info[\"recall\"]:.4f}')
+          "
+
+      - name: Upload drift report artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: drift-report-py${{ matrix.python-version }}
+          path: data/drift_reports/*.html
+          retention-days: 7
+
+      - name: Upload pipeline log artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pipeline-log-py${{ matrix.python-version }}
+          path: models/pipeline.log
+          retention-days: 7
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t bmw-ifactory-mlops:latest .
+
+      - name: Docker smoke test
+        run: |
+          docker run --rm bmw-ifactory-mlops:latest python -c "
+          import sys
+          sys.path.insert(0, '.')
+          from pipeline.ingest import generate_batch, validate
+          df = generate_batch(n_cycles=50, seed=0)
+          result = validate(df)
+          assert result.passed
+          print('Docker smoke test passed')
+          "
