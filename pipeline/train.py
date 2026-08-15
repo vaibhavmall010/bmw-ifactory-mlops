@@ -175,7 +175,7 @@ def train_isolation_forest(X: np.ndarray, y: np.ndarray,
     clf = Pipeline([
         ("scaler", StandardScaler()),
         ("model", IsolationForest(
-            n_estimators=200,sss
+            n_estimators=200,
             contamination=contamination,
             random_state=42,
             n_jobs=-1,
